@@ -1,20 +1,21 @@
 package com.exemple;
 
+import java.util.*;
+
 public class Family {
     private Human mother;
     private Human father;
-    private Human[] children;
-    private Pet pet;
-
+    private List<Human> children;
+    private Set<Pet> pets;
 
     public Family(Human mother, Human father) {
         this.mother = mother;
         this.father = father;
-        this.children = new Human[0];
+        this.children = new ArrayList<>();
+        this.pets = new HashSet<>();
         this.mother.setFamily(this);
         this.father.setFamily(this);
     }
-
 
     public Human getMother() {
         return mother;
@@ -32,112 +33,74 @@ public class Family {
         this.father = father;
     }
 
-    public Human[] getChildren() {
+    public List<Human> getChildren() {
         return children;
     }
 
-    public void setChildren(Human[] children) {
+    public void setChildren(List<Human> children) {
         this.children = children;
     }
 
-    public Pet getPet() {
-        return pet;
+    public Set<Pet> getPets() {
+        return pets;
+    }
+
+    public void setPets(Set<Pet> pets) {
+        this.pets = pets;
     }
 
     public void setPet(Pet pet) {
-        this.pet = pet;
+        this.pets.clear();
+        this.pets.add(pet);
     }
 
+    public Pet getPet() {
+        return pets.isEmpty() ? null : pets.iterator().next();
+    }
+
+    public void addPet(Pet pet) {
+        this.pets.add(pet);
+    }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Mother: ").append(mother).append("\n");
-        sb.append("Father: ").append(father).append("\n");
-        sb.append("Children: ");
-        if (children == null || children.length == 0) {
-            sb.append("No children\n");
-        } else {
-            for (Human child : children) {
-                sb.append(child).append("\n");
-            }
-        }
-        sb.append("Pet: ");
-        if (pet == null) {
-            sb.append("No pet");
-        } else {
-            sb.append(pet);
-        }
-        return sb.toString();
+        return "Family{" +
+                "Mother: " + mother +
+                ", Father: " + father +
+                ", Children: " + (children.isEmpty() ? "No children" : children) +
+                ", Pet: " + (pets.isEmpty() ? "No pet" : pets) +
+                '}';
     }
-
-    @Override
-    protected void finalize() throws Throwable {
-        System.out.println("Finalizing object: " + this);
-        super.finalize();
-    }
-
 
     public void addChild(Human child) {
-        if (children == null) {
-            children = new Human[1];
-            children[0] = child;
-        } else {
-            Human[] newChildren = new Human[children.length + 1];
-            System.arraycopy(children, 0, newChildren, 0, children.length);
-            newChildren[children.length] = child;
-            children = newChildren;
-        }
+        children.add(child);
         child.setFamily(this);
     }
 
-
     public boolean deleteChild(Human child) {
-        if (children == null || children.length == 0) {
+        if (children.isEmpty()) {
             return false;
         }
 
-        int index = -1;
-        for (int i = 0; i < children.length; i++) {
-            if (children[i].equals(child)) {
-                index = i;
-                break;
-            }
+        boolean isRemoved = children.remove(child);
+        if (isRemoved) {
+            child.setFamily(null);
         }
-
-        if (index == -1) {
-            return false;
-        }
-
-        return deleteChild(index);
+        return isRemoved;
     }
 
-
     public boolean deleteChild(int index) {
-        if (children == null || index < 0 || index >= children.length) {
+        if (children.isEmpty() || index < 0 || index >= children.size()) {
             return false;
         }
 
-        Human[] newChildren = new Human[children.length - 1];
-        for (int i = 0, j = 0; i < children.length; i++) {
-            if (i != index) {
-                newChildren[j++] = children[i];
-            } else {
-                children[i].setFamily(null); // Remove family reference
-            }
-        }
-
-        children = newChildren;
+        Human child = children.get(index);
+        children.remove(index);
+        child.setFamily(null);
         return true;
     }
 
-
     public int countFamily() {
-        int count = 2; // Mother and father
-        if (children != null) {
-            count += children.length;
-        }
-        return count;
+        return 2 + children.size();
     }
-
 }

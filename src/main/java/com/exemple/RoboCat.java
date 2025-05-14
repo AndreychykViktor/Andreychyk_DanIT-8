@@ -4,27 +4,27 @@ public class RoboCat extends Pet implements Foulable {
     private String color;
 
     public RoboCat(String nickname, int age, int trickLevel, String[] habits) {
-        super(nickname, age, trickLevel, habits);
+        super("RoboCat", nickname, age, trickLevel, habits);
         setColorBasedOnSpecies();
     }
 
     public RoboCat(String nickname) {
-        super(nickname);
+        super("RoboCat", nickname, 0, 0, null);
         setColorBasedOnSpecies();
     }
 
     public RoboCat(String nickname, int age) {
-        super(nickname, age, 0, null);
+        super("RoboCat", nickname, age, 0, null);
         setColorBasedOnSpecies();
     }
 
     public RoboCat(String nickname, int age, int trickLevel) {
-        super(nickname, age, trickLevel, null);
+        super("RoboCat", nickname, age, trickLevel, null);
         setColorBasedOnSpecies();
     }
 
     private void setColorBasedOnSpecies() {
-        if (getSpecies() == Species.UNKNOWN) {
+        if (getSpecies() == null || getSpecies().equals("UNKNOWN")) {
             this.color = "UNKNOWN";
         } else {
             this.color = "Silver";

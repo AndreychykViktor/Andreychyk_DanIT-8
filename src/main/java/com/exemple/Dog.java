@@ -4,27 +4,27 @@ public class Dog extends Pet implements Foulable {
     private String breed;
 
     public Dog(String nickname, int age, int trickLevel, String[] habits) {
-        super(nickname, age, trickLevel, habits);
+        super("Dog", nickname, age, trickLevel, habits);
         setBreedBasedOnSpecies();
     }
 
     public Dog(String nickname) {
-        super(nickname);
+        super("Dog", nickname, 0, 0, null);
         setBreedBasedOnSpecies();
     }
 
     public Dog(String nickname, int age) {
-        super(nickname, age, 0, null);
+        super("Dog", nickname, age, 0, null);
         setBreedBasedOnSpecies();
     }
 
     public Dog(String nickname, int age, int trickLevel) {
-        super(nickname, age, trickLevel, null);
+        super("Dog", nickname, age, trickLevel, null);
         setBreedBasedOnSpecies();
     }
 
     private void setBreedBasedOnSpecies() {
-        if (getSpecies() == Species.UNKNOWN) {
+        if (getSpecies() == null || "UNKNOWN".equals(getSpecies())) {
             this.breed = "UNKNOWN";
         } else {
             this.breed = "Pitbull";
