@@ -64,11 +64,11 @@ public class Family {
 
     @Override
     public String toString() {
-        return "Family{" +
+        return "Family{" + "\n" +
                 "Mother: " + mother +
-                ", Father: " + father +
-                ", Children: " + (children.isEmpty() ? "No children" : children) +
-                ", Pet: " + (pets.isEmpty() ? "No pet" : pets) +
+                "Father: " + father +
+                "Children: " + "\n" + (children.isEmpty() ? "No children" : children) +
+                "Pet: " + (pets.isEmpty() ? "No pet" : pets) +
                 '}';
     }
 

@@ -1,28 +1,33 @@
 package com.exemple;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Human {
     private String name;
     private String surname;
-    private int year;
+    private long birthDate;
     private int iq;
     private Map<DayOfWeek, String> schedule;
     private Family family;
 
-    public Human(String name, String surname, int year, int iq, Map<DayOfWeek, String> schedule) {
+    public Human(String name, String surname, long birthDate, int iq, Map<DayOfWeek, String> schedule) {
         this.name = name;
         this.surname = surname;
-        this.year = year;
+        this.birthDate = birthDate;
         this.iq = iq;
         this.schedule = schedule != null ? schedule : new HashMap<>();
     }
 
-    public Human(String name, String surname, int year, int iq, String[][] schedule) {
+    public Human(String name, String surname, long birthDate, int iq, String[][] schedule) {
         this.name = name;
         this.surname = surname;
-        this.year = year;
+        this.birthDate = birthDate;
         this.iq = iq;
         this.schedule = new HashMap<>();
 
@@ -37,7 +42,26 @@ public class Human {
         }
     }
 
+    public Human(String name, String surname, String birthDateStr, int iq) throws java.text.ParseException {
+        this.name = name;
+        this.surname = surname;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = dateFormat.parse(birthDateStr);
+        this.birthDate = date.getTime();
+        this.iq = iq;
+    }
 
+    public String describeAge() {
+        LocalDate birthLocalDate = new Date(birthDate).toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        LocalDate currentDate = LocalDate.now();
+        Period period = Period.between(birthLocalDate, currentDate);
+
+        return String.format("%d роки, %d місяців, %d днів",
+                period.getYears(), period.getMonths(), period.getDays());
+    }
     public void greetPet() {
         if (family != null && !family.getPets().isEmpty()) {
             Pet pet = family.getPets().iterator().next();
@@ -73,12 +97,12 @@ public class Human {
         this.surname = surname;
     }
 
-    public int getYear() {
-        return year;
+    public long getYear() {
+        return birthDate;
     }
 
-    public void setYear(int year) {
-        this.year = year;
+    public void setYear(long birthDate) {
+        this.birthDate = birthDate;
     }
 
     public int getIq() {
@@ -107,12 +131,16 @@ public class Human {
 
     @Override
     public String toString() {
-        return "Human{" +
-                "name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", year=" + year +
-                ", iq=" + iq +
-                ", schedule=" + schedule +
-                '}';
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        String birthDateFormatted = formatter.format(new Date(birthDate));
+
+        return "Human{" + "\n" +
+                " Name='" + name + '\'' + ",\n" +
+                " Surname='" + surname + '\'' +",\n" +
+                " BirthDate=" + birthDateFormatted +",\n" +
+                " ExactTime=" + describeAge() +",\n" +
+                " Iq=" + iq +",\n" +
+                " Schedule=" + schedule +",\n" +
+                '}' + "\n";
     }
 }
