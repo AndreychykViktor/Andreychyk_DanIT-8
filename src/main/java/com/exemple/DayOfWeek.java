@@ -9,6 +9,8 @@ public enum DayOfWeek {
     SATURDAY("субота"),
     SUNDAY("неділя");
 
+
+
     private final String ukrName;
 
     DayOfWeek(String ukrName) {
@@ -18,7 +20,6 @@ public enum DayOfWeek {
     public String getUkrName() {
         return ukrName;
     }
-
     @Override
     public String toString() {
         return ukrName;

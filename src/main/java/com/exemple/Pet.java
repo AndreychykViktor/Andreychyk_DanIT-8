@@ -22,6 +22,7 @@ public class Pet {
         }
     }
 
+
     public void respond() {
         System.out.println("Привіт, господарю. Я - " + nickname + ". Я скучив!");
     }

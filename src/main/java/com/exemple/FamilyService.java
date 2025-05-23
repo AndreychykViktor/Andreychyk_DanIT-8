@@ -11,19 +11,37 @@ import java.util.stream.Collectors;
 public class FamilyService {
     private List<Family> families = new ArrayList<>();
 
-
-    public void displayAllFamilies() {
-        families.forEach(System.out::println);
+    public String prettyFormat(Family family) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Сім'я: \n");
+        sb.append("  Мати: ").append(family.getMother()).append("\n");
+        sb.append("  Батько: ").append(family.getFather()).append("\n");
+        sb.append("  Діти: ").append(family.getChildren()).append("\n");
+        sb.append("  Тварина: ").append(family.getPet()).append("\n");
+        return sb.toString();
     }
 
+    public void displayAllFamilies() {
+        for (int i = 0; i < families.size(); i++) {
+            System.out.println((i + 1) + ". " + prettyFormat(families.get(i)));
+            System.out.println();
+        }
+    }
+
+    public Family getFamilyByIndex(int familyIndex) {
+        if (familyIndex >= 0 && familyIndex < families.size()) {
+            return families.get(familyIndex);
+        }
+        return null;
+    }
 
     public List<Family> getFamiliesBiggerThan(int count) {
         List<Family> filteredFamilies = families.stream()
                 .filter(family -> family.countFamily() > count)
                 .collect(Collectors.toList());
 
-        filteredFamilies.forEach(family ->
-                System.out.println(family + ", members: " + family.countFamily()));
+        //filteredFamilies.forEach(family ->
+                //System.out.println(family + ", members: " + family.countFamily()));
 
         return filteredFamilies;
     }

@@ -1,10 +1,19 @@
 package com.exemple;
+import com.exemple.DayOfWeek;
+import java.util.HashMap;
 
 final class Man extends Human {
-    public Man(String name, String surname, int year, int iq, String[][] schedule) {
-        super(name, surname, year, iq, schedule);
-    }
 
+   public Man(String name, String surname, int year, int iq, HashMap<DayOfWeek, String> schedule) {
+       super(name, surname, year, iq, schedule);
+   }
+
+   public void addScheduleItem(DayOfWeek day, String activity) {
+       if (getSchedule() == null) {
+           setSchedule(new HashMap<DayOfWeek, String>());
+       }
+       getSchedule().put(day, activity);
+   }
     @Override
     public void greetPet() {
         if (getFamily() != null && getFamily().getPet() != null) {

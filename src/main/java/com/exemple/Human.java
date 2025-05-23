@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.util.HashMap;
-import java.util.Map;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -13,10 +12,10 @@ public class Human {
     private String surname;
     private long birthDate;
     private int iq;
-    private Map<DayOfWeek, String> schedule;
+    private HashMap<DayOfWeek, String> schedule;
     private Family family;
 
-    public Human(String name, String surname, long birthDate, int iq, Map<DayOfWeek, String> schedule) {
+    public Human(String name, String surname, long birthDate, int iq, HashMap<DayOfWeek, String> schedule) {
         this.name = name;
         this.surname = surname;
         this.birthDate = birthDate;
@@ -113,11 +112,11 @@ public class Human {
         this.iq = iq;
     }
 
-   public Map<DayOfWeek, String> getSchedule() {
+   public HashMap<DayOfWeek, String> getSchedule() {
        return schedule;
    }
 
-   public void setSchedule(Map<DayOfWeek, String> schedule) {
+   public void setSchedule(HashMap<DayOfWeek, String> schedule) {
        this.schedule = schedule;
    }
 
@@ -142,5 +141,13 @@ public class Human {
                 " Iq=" + iq +",\n" +
                 " Schedule=" + schedule +",\n" +
                 '}' + "\n";
+    }
+
+    public String prettyFormat() {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        String birthDateFormatted = formatter.format(new Date(birthDate));
+
+        return String.format("HUMAN %s %s, %s (%s), IQ: %d",
+                name, surname, birthDateFormatted, describeAge(), iq);
     }
 }
