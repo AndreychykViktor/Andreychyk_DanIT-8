@@ -1,8 +1,9 @@
 package com.exemple;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Family {
+public class Family implements Serializable {
     private Human mother;
     private Human father;
     private List<Human> children;

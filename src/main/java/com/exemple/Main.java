@@ -76,9 +76,12 @@ public class Main {
         System.out.println("7. Видалити сім'ю за індексом");
         System.out.println("8. Редагувати сім'ю за індексом");
         System.out.println("9. Видалити всіх дітей старше віку");
+        System.out.println("10. Зберегти сім'ї у файл");
+        System.out.println("11. Завантажити сім'ї з файлу");
         System.out.println("exit. Вийти");
         System.out.print("Оберіть команду: ");
     }
+
     private static void printMenuForEdit() {
         System.out.println("\n=== Меню ===");
         System.out.println("1. Народити дитину");
@@ -115,7 +118,6 @@ public class Main {
         }
 
 
-
         System.out.println("Введіть ім'я батька: ");
         String fatherName = scanner.nextLine();
         System.out.println("Введіть прізвище батька: ");
@@ -140,8 +142,6 @@ public class Main {
         }
 
 
-
-
         System.out.println("Введіть ім'я дитини: ");
         String childName = scanner.nextLine();
         System.out.println("Введіть прізвище дитини: ");
@@ -150,8 +150,6 @@ public class Main {
         String childBirthDate = scanner.nextLine();
         System.out.println("Введіть дату IQ дитини: ");
         int childIQ = Integer.parseInt(scanner.nextLine());
-
-
 
 
         System.out.println("Введіть ім'я тварини: ");
@@ -200,7 +198,7 @@ public class Main {
             return;
         }
 
-        System.out.println("Редагування сім'ї: "+ familyIndex);
+        System.out.println("Редагування сім'ї: " + familyIndex);
         while (true) {
             printMenuForEdit();
             String input = scanner.nextLine().trim();
@@ -289,6 +287,27 @@ public class Main {
                         int age = Integer.parseInt(scanner.nextLine());
                         familyService.deleteAllChildrenOlderThan(age);
                         System.out.println("Видалено дітей старше " + age + " років.");
+                        break;
+                    case "10":
+                        System.out.print("Введіть ім'я файлу для збереження: ");
+                        String saveFile = scanner.nextLine();
+                        familyService.saveToFile(saveFile);
+                        System.out.println("Дані збережено.");
+                        break;
+                    case "11":
+                        System.out.print("Завантажити з датабази? (так/ні): ");
+                        String loadFromDb = scanner.nextLine().trim();
+                        if (loadFromDb.equalsIgnoreCase("так")) {
+                            System.out.print("Введіть ім'я файлу для завантаження: ");
+                            String loadFileDB = scanner.nextLine();
+                            familyService.loadFamiliesFromDB(loadFileDB);
+                            System.out.println("Дані завантажено з бази даних.");
+                            break;
+                        }
+                        System.out.print("Введіть ім'я файлу для завантаження: ");
+                        String loadFile = scanner.nextLine();
+                        familyService.loadFromFile(loadFile);
+                        System.out.println("Дані завантажено.");
                         break;
                     case "exit":
                         System.out.println("Вихід з програми.");

@@ -23,6 +23,16 @@ public class Human {
         this.schedule = schedule != null ? schedule : new HashMap<>();
     }
 
+public Human(String name, String surname, String birthDateStr, int iq, HashMap<DayOfWeek, String> schedule) throws java.text.ParseException {
+    this.name = name;
+    this.surname = surname;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    Date date = dateFormat.parse(birthDateStr);
+    this.birthDate = date.getTime();
+    this.iq = iq;
+    this.schedule = schedule != null ? schedule : new HashMap<>();
+}
+
     public Human(String name, String surname, long birthDate, int iq, String[][] schedule) {
         this.name = name;
         this.surname = surname;

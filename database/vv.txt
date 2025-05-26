@@ -1,0 +1,70 @@
+ Сім'я 1:
+  Мати: Human{
+  Name='Марія',
+  Surname='Петренко',
+  BirthDate=01/01/1970,
+  ExactTime=55 роки, 4 місяців, 23 днів,
+  Iq=125,
+  Schedule={п'ятниця=зустріч з подругами, понеділок=йога},
+  }
+  Батько: Human{
+  Name='Іван',
+  Surname='Петренко',
+  BirthDate=01/01/1970,
+  ExactTime=55 роки, 4 місяців, 23 днів,
+  Iq=120,
+  Schedule={вівторок=спортзал, понеділок=робота},
+  }
+  Діти: [Human{
+  Name='Петро',
+  Surname='Петренко',
+  BirthDate=01/01/2010,
+  ExactTime=15 роки, 4 місяців, 23 днів,
+  Iq=100,
+  Schedule=null,
+  }
+  , Human{
+  Name='Ольга',
+  Surname='Петренко',
+  BirthDate=01/01/2012,
+  ExactTime=13 роки, 4 місяців, 23 днів,
+  Iq=110,
+  Schedule=null,
+  }
+  ]
+  Тварина: Dog{species='Dog', nickname='Рекс', age=3, trickLevel=70, habits=[давати лапу, сидіти]}
+Сім'я 2:
+  Мати: Human{
+  Name='Марія',
+  Surname='Петренко',
+  BirthDate=01/01/1970,
+  ExactTime=55 роки, 4 місяців, 23 днів,
+  Iq=125,
+  Schedule={п'ятниця=зустріч з подругами, понеділок=йога},
+  }
+  Батько: Human{
+  Name='Іван',
+  Surname='Петренко',
+  BirthDate=01/01/1970,
+  ExactTime=55 роки, 4 місяців, 23 днів,
+  Iq=120,
+  Schedule={вівторок=спортзал, понеділок=робота},
+  }
+  Діти: [Human{
+  Name='Петро',
+  Surname='Петренко',
+  BirthDate=01/01/2010,
+  ExactTime=15 роки, 4 місяців, 23 днів,
+  Iq=100,
+  Schedule=null,
+  }
+  , Human{
+  Name='Ольга',
+  Surname='Петренко',
+  BirthDate=01/01/2012,
+  ExactTime=13 роки, 4 місяців, 23 днів,
+  Iq=110,
+  Schedule=null,
+  }
+  ]
+  Тварина: Dog{species='Dog', nickname='Рекс', age=3, trickLevel=70, habits=[давати лапу, сидіти]}
