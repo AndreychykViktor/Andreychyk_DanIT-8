@@ -74,6 +74,12 @@ public class FamilyService {
         System.out.println("Trying to open file: " + file.getAbsolutePath());
         loadFromFile(filename);
     }
+    //Примітка
+    //Ця функція мала би працювати з файломз датабази, який містить дані про сім'ї.
+    //Але вона чомусь не працює, хоча і застосовує метод loadFromFile, який повністю робочий, я використовував для перевірки файл families.txt.
+    //Мені коже раз вибивається така помилка:
+    //Trying to open file: C:\Users\andre\IdeaProjects\hm6\database\vv.txt
+    //Сталася помилка: vv.txt (The system cannot find the file specified)
 
     private Human parseHumanBlock(BufferedReader reader) throws IOException, ParseException {
         String name = "", surname = "", birthDate = "";
