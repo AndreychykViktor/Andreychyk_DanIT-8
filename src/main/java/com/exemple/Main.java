@@ -1,23 +1,21 @@
 package com.exemple;
 
+import com.exemple.controller.FamilyController;
+import com.exemple.dao.CollectionFamilyDao;
+import com.exemple.service.FamilyService;
+
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
-
-import com.exemple.DayOfWeek;
 
 import static com.exemple.DayOfWeek.*;
 
-import com.exemple.FamilyOverflowException;
-import com.exemple.FamilyService;
-
-
 public class Main {
     private static final Scanner scanner = new Scanner(System.in);
-    private static final FamilyService familyService = new FamilyService();
+    private static final FamilyController controller =
+            new FamilyController(new FamilyService(new CollectionFamilyDao()));
 
-    private static void createFamilies(FamilyService familyService) {
+    private static void createFamilies() {
         try {
             Pet dog = new Dog("Рекс", 3, 70, new String[]{"сидіти", "давати лапу"});
             Pet cat = new DomesticCat("Мурка", 2, 50, new String[]{"стрибати", "спати"});
@@ -37,28 +35,20 @@ public class Main {
             Human daughter = new Human("Ольга", "Петренко", "01/01/2012", 110);
             Human adoptedChild = new Human("Андрій", "Сидоренко", "30/09/2012", 105);
 
-            // 2 2
-            Family family1 = new Family(mother, father);
-            family1.addChild(son);
-            family1.addChild(daughter);
-            family1.setPet(dog);
+            Family family1 = controller.createNewFamily(mother, father);
+            controller.adoptChild(family1, son);
+            controller.adoptChild(family1, daughter);
+            controller.addPet(controller.getAllFamilies().indexOf(family1), dog);
 
-            // 2 1
-            Family family2 = new Family(mother, father);
-            family2.addChild(daughter);
-            family2.setPet(cat);
+            Family family2 = controller.createNewFamily(mother, father);
+            controller.adoptChild(family2, daughter);
+            controller.addPet(controller.getAllFamilies().indexOf(family2), cat);
 
-            // 2 3
-            Family family3 = new Family(mother, father);
-            family3.addChild(son);
-            family3.addChild(daughter);
-            family3.addChild(adoptedChild);
-            family3.setPet(fish);
-
-
-            familyService.addFamily(family1);
-            familyService.addFamily(family2);
-            familyService.addFamily(family3);
+            Family family3 = controller.createNewFamily(mother, father);
+            controller.adoptChild(family3, son);
+            controller.adoptChild(family3, daughter);
+            controller.adoptChild(family3, adoptedChild);
+            controller.addPet(controller.getAllFamilies().indexOf(family3), fish);
 
         } catch (ParseException e) {
             System.err.println("Error : " + e.getMessage());
@@ -90,153 +80,83 @@ public class Main {
         System.out.print("Оберіть команду: ");
     }
 
-    private static void createFamily() throws ParseException {
+    private static void createFamily() {
+        try {
+            System.out.println("Введіть ім'я матері: ");
+            String motherName = scanner.nextLine();
+            System.out.println("Введіть прізвище матері: ");
+            String motherSurname = scanner.nextLine();
+            System.out.println("Введіть рік народження матері (дд/мм/рррр): ");
+            long motherYear = Long.parseLong(scanner.nextLine());
+            System.out.println("Введіть IQ матері: ");
+            int motherIQ = Integer.parseInt(scanner.nextLine());
+            HashMap<DayOfWeek, String> motherSchedule = new HashMap<>();
 
+            System.out.println("Введіть ім'я батька: ");
+            String fatherName = scanner.nextLine();
+            System.out.println("Введіть прізвище батька: ");
+            String fatherSurname = scanner.nextLine();
+            System.out.println("Введіть рік народження батька (дд/мм/рррр): ");
+            long fatherYear = Long.parseLong(scanner.nextLine());
+            System.out.println("Введіть IQ батька: ");
+            int fatherIQ = Integer.parseInt(scanner.nextLine());
+            HashMap<DayOfWeek, String> fatherSchedule = new HashMap<>();
 
-        System.out.println("Введіть ім'я матері: ");
-        String motherName = scanner.nextLine();
-        System.out.println("Введіть прізвище матері: ");
-        String motherSurname = scanner.nextLine();
-        System.out.println("Введіть рік народження матері (дд/мм/рррр): ");
-        long motherYear = Long.parseLong(scanner.nextLine());
-        System.out.println("Введіть IQ матері: ");
-        int motherIQ = Integer.parseInt(scanner.nextLine());
-        System.out.println("Введіть розклад дня матері: ");
-        HashMap<DayOfWeek, String> mother_schedule = new HashMap<>();
-        while (true) {
-            System.out.println("Введіть день тижня (або 'done' щоб завершити): ");
-            String dayInput = scanner.nextLine().trim();
-            if (dayInput.equalsIgnoreCase("done")) break;
-            try {
-                DayOfWeek day = DayOfWeek.valueOf(dayInput.toUpperCase());
-                System.out.println("Введіть задачу на " + day + ": ");
-                String task = scanner.nextLine();
-                mother_schedule.put(day, task);
-            } catch (IllegalArgumentException e) {
-                System.out.println("НЕВІДОМИЙ ДЕНЬ ТИЖНЯ: " + dayInput);
-            }
+            Human mother = new Human(motherName, motherSurname, motherYear, motherIQ, motherSchedule);
+            Human father = new Human(fatherName, fatherSurname, fatherYear, fatherIQ, fatherSchedule);
+
+            Family family = controller.createNewFamily(mother, father);
+
+            System.out.println("Сім'ю створено.");
+        } catch (Exception e) {
+            System.out.println("Помилка при створенні сім'ї: " + e.getMessage());
         }
-
-
-        System.out.println("Введіть ім'я батька: ");
-        String fatherName = scanner.nextLine();
-        System.out.println("Введіть прізвище батька: ");
-        String fatherSurname = scanner.nextLine();
-        System.out.println("Введіть рік народження батька (дд/мм/рррр): ");
-        long fatherYear = Long.parseLong(scanner.nextLine());
-        System.out.println("Введіть IQ батька: ");
-        int fatherIQ = Integer.parseInt(scanner.nextLine());
-        HashMap<DayOfWeek, String> father_schedule = new HashMap<>();
-        while (true) {
-            System.out.println("Введіть день тижня (або 'done' щоб завершити): ");
-            String dayInput = scanner.nextLine().trim();
-            if (dayInput.equalsIgnoreCase("done")) break;
-            try {
-                DayOfWeek day = DayOfWeek.valueOf(dayInput.toUpperCase());
-                System.out.println("Введіть задачу на " + day + ": ");
-                String task = scanner.nextLine();
-                mother_schedule.put(day, task);
-            } catch (IllegalArgumentException e) {
-                System.out.println("НЕВІДОМИЙ ДЕНЬ ТИЖНЯ: " + dayInput);
-            }
-        }
-
-
-        System.out.println("Введіть ім'я дитини: ");
-        String childName = scanner.nextLine();
-        System.out.println("Введіть прізвище дитини: ");
-        String childSurname = scanner.nextLine();
-        System.out.println("Введіть дату народження дитини (дд/мм/рррр): ");
-        String childBirthDate = scanner.nextLine();
-        System.out.println("Введіть дату IQ дитини: ");
-        int childIQ = Integer.parseInt(scanner.nextLine());
-
-
-        System.out.println("Введіть ім'я тварини: ");
-        String petName = scanner.nextLine();
-        System.out.println("Введіть вік тварини: ");
-        int petAge = Integer.parseInt(scanner.nextLine());
-        System.out.println("Введіть на скільки розумна тварина: ");
-        int petTrickLevel = Integer.parseInt(scanner.nextLine());
-        System.out.println("Введіть вид тварини (Dog, DomesticCat, Fish): ");
-        String petType = scanner.nextLine();
-        Pet pet = null;
-        switch (petType.toLowerCase()) {
-            case "dog":
-                pet = new Dog(petName, petAge, petTrickLevel, new String[]{"сидіти", "давати лапу"});
-                break;
-            case "domesticcat":
-                pet = new DomesticCat(petName, petAge, petTrickLevel, new String[]{"стрибати", "спати"});
-                break;
-            case "fish":
-                pet = new Fish(petName, petAge, petTrickLevel, new String[]{"плавати"});
-                break;
-            default:
-                System.out.println("Невідомий тип тварини.");
-                return;
-        }
-        Human mother = new Human(motherName, motherSurname, motherYear, motherIQ, new HashMap<>());
-        Human father = new Human(fatherName, fatherSurname, fatherYear, fatherIQ, new HashMap<>());
-        Human child = new Human(childName, childSurname, childBirthDate, childIQ);
-
-        Family family = new Family(mother, father);
-        family.addChild(child);
-        family.setPet(pet);
-        familyService.addFamily(family);
-        System.out.println("Сім'ю створено.");
-
-        System.out.println("Family creation not implemented yet.");
     }
 
     private static void editFamily() {
-
         System.out.print("Введіть номер сім'ї для редагування: ");
-        int familyIndex = Integer.parseInt(scanner.nextLine()) - 1;
-        Family family = familyService.getFamilyByIndex(familyIndex);
+        int familyIndex = Integer.parseInt(scanner.nextLine());
+        Family family = controller.getFamilyById(familyIndex);
         if (family == null) {
             System.out.println("Сім'я не знайдена.");
             return;
         }
-
-        System.out.println("Редагування сім'ї: " + familyIndex);
         while (true) {
             printMenuForEdit();
             String input = scanner.nextLine().trim();
-            try {
-                switch (input) {
-                    case "1":
-                        System.out.print("Введіть ім'я дитини: ");
-                        String childName = scanner.nextLine();
-                        System.out.print("Введіть прізвище дитини: ");
-                        String childSurname = scanner.nextLine();
-                        System.out.print("Введіть дату народження дитини (дд/мм/рррр): ");
-                        String childBirthDate = scanner.nextLine();
-                        System.out.print("Введіть IQ дитини: ");
-                        int childIQ = Integer.parseInt(scanner.nextLine());
-                        Human child = new Human(childName, childSurname, childBirthDate, childIQ);
-                        family.addChild(child);
-                        break;
-                    case "2":
-                        System.out.print("Введіть ім'я дитини: ");
-                        String adoptedChildName = scanner.nextLine();
-                        System.out.print("Введіть прізвище дитини: ");
-                        String adoptedChildSurname = scanner.nextLine();
-                        System.out.print("Введіть дату народження дитини (дд/мм/рррр): ");
-                        String adoptedChildBirthDate = scanner.nextLine();
-                        System.out.print("Введіть IQ дитини: ");
-                        int adoptedChildIQ = Integer.parseInt(scanner.nextLine());
-                        Human adoptedChild = new Human(adoptedChildName, adoptedChildSurname, adoptedChildBirthDate, adoptedChildIQ);
-                        family.addChild(adoptedChild);
-                        break;
-                    case "3":
-                        return;
-                    default:
-                        System.out.println("Невідома команда.");
-                }
-            } catch (FamilyOverflowException e) {
-                System.out.println("Помилка: " + e.getMessage());
-            } catch (Exception e) {
-                System.out.println("Сталася помилка: " + e.getMessage());
+            switch (input) {
+                case "1":
+                    System.out.print("Введіть ім'я хлопчика: ");
+                    String boyName = scanner.nextLine();
+                    System.out.print("Введіть ім'я дівчинки: ");
+                    String girlName = scanner.nextLine();
+                    controller.bornChild(family, boyName, girlName);
+                    System.out.println("Дитину додано.");
+                    break;
+                case "2":
+                    System.out.print("Введіть ім'я дитини: ");
+                    String childName = scanner.nextLine();
+                    System.out.print("Введіть прізвище дитини: ");
+                    String childSurname = scanner.nextLine();
+                    System.out.print("Введіть дату народження дитини (дд/мм/рррр): ");
+                    String childBirthDate = scanner.nextLine();
+                    System.out.print("Введіть IQ дитини: ");
+                    int childIQ = Integer.parseInt(scanner.nextLine());
+                    Human adoptedChild = null;
+                    try {
+                        adoptedChild = new Human(childName, childSurname, childBirthDate, childIQ);
+                    } catch (ParseException e) {
+                        System.err.println("Error: " + e.getMessage());
+                    }
+                    if (adoptedChild != null) {
+                        controller.adoptChild(family, adoptedChild);
+                        System.out.println("Дитину усиновлено.");
+                    }
+                    break;
+                case "3":
+                    return;
+                default:
+                    System.out.println("Невідома команда.");
             }
         }
     }
@@ -248,26 +168,28 @@ public class Main {
             try {
                 switch (input) {
                     case "1":
-                        createFamilies(familyService);
+                        createFamilies();
                         System.out.println("Тестові сім'ї створено.");
                         break;
                     case "2":
-                        familyService.displayAllFamilies();
+                        controller.displayAllFamilies();
                         break;
                     case "3":
                         System.out.print("Введіть мінімальну кількість людей: ");
                         int min = Integer.parseInt(scanner.nextLine());
-                        familyService.getFamiliesBiggerThan(min).forEach(f -> System.out.println(familyService.prettyFormat(f)));
+                        controller.getFamiliesBiggerThan(min)
+                                .forEach(System.out::println);
                         break;
                     case "4":
                         System.out.print("Введіть максимальну кількість людей: ");
                         int max = Integer.parseInt(scanner.nextLine());
-                        familyService.getFamiliesLessThan(max).forEach(f -> System.out.println(familyService.prettyFormat(f)));
+                        controller.getFamiliesLessThan(max)
+                                .forEach(System.out::println);
                         break;
                     case "5":
                         System.out.print("Введіть кількість членів сім'ї: ");
                         int count = Integer.parseInt(scanner.nextLine());
-                        int result = familyService.countFamiliesWithMemberNumber(count);
+                        int result = controller.countFamiliesWithMemberNumber(count);
                         System.out.println("Кількість сімей: " + result);
                         break;
                     case "6":
@@ -275,8 +197,8 @@ public class Main {
                         break;
                     case "7":
                         System.out.print("Введіть номер сім'ї для видалення: ");
-                        int delId = Integer.parseInt(scanner.nextLine()) - 1;
-                        familyService.deleteFamily(delId);
+                        int delId = Integer.parseInt(scanner.nextLine());
+                        controller.deleteFamilyByIndex(delId);
                         System.out.println("Сім'ю видалено.");
                         break;
                     case "8":
@@ -285,28 +207,19 @@ public class Main {
                     case "9":
                         System.out.print("Введіть вік: ");
                         int age = Integer.parseInt(scanner.nextLine());
-                        familyService.deleteAllChildrenOlderThan(age);
+                        controller.deleteAllChildrenOlderThen(age);
                         System.out.println("Видалено дітей старше " + age + " років.");
                         break;
                     case "10":
                         System.out.print("Введіть ім'я файлу для збереження: ");
                         String saveFile = scanner.nextLine();
-                        familyService.saveToFile(saveFile);
+                        controller.saveToFile(saveFile);
                         System.out.println("Дані збережено.");
                         break;
                     case "11":
-                        System.out.print("Завантажити з датабази? (так/ні): ");
-                        String loadFromDb = scanner.nextLine().trim();
-                        if (loadFromDb.equalsIgnoreCase("так")) {
-                            System.out.print("Введіть ім'я файлу для завантаження: ");
-                            String loadFileDB = scanner.nextLine();
-                            familyService.loadFamiliesFromDB(loadFileDB);
-                            System.out.println("Дані завантажено з бази даних.");
-                            break;
-                        }
                         System.out.print("Введіть ім'я файлу для завантаження: ");
                         String loadFile = scanner.nextLine();
-                        familyService.loadFromFile(loadFile);
+                        controller.loadFromFile(loadFile);
                         System.out.println("Дані завантажено.");
                         break;
                     case "exit":
@@ -315,8 +228,6 @@ public class Main {
                     default:
                         System.out.println("Невідома команда.");
                 }
-            } catch (FamilyOverflowException e) {
-                System.out.println("Помилка: " + e.getMessage());
             } catch (Exception e) {
                 System.out.println("Сталася помилка: " + e.getMessage());
             }

@@ -1,16 +1,138 @@
-package com.exemple;
+package com.exemple.service;
+
+import com.exemple.*;
+import com.exemple.dao.FamilyDao;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.BufferedWriter;
+import java.io.BufferedReader;
+
 
 import java.text.ParseException;
+import java.io.IOException;
+
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.io.*;
-
 
 public class FamilyService {
-    private List<Family> families = new ArrayList<>();
+    private final FamilyDao familyDao;
+
+    public FamilyService(FamilyDao familyDao) {
+        this.familyDao = familyDao;
+    }
+
+    public List<Family> getAllFamilies() {
+        return familyDao.getAllFamilies();
+    }
+
+    private String prettyFormat(Family family) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Мати: ").append(family.getMother()).append(System.lineSeparator());
+        sb.append("Батько: ").append(family.getFather()).append(System.lineSeparator());
+        sb.append("Діти: [").append(System.lineSeparator());
+        for (Human child : family.getChildren()) {
+            sb.append("  ").append(child).append(System.lineSeparator());
+        }
+        sb.append("]").append(System.lineSeparator());
+        sb.append("Тварина: ").append(family.getPet()).append(System.lineSeparator());
+        return sb.toString();
+    }
+
+    public void displayAllFamilies() {
+        List<Family> families = familyDao.getAllFamilies();
+        for (int i = 0; i < families.size(); i++) {
+            System.out.println((i+1) + ": " + families.get(i));
+        }
+    }
+
+    public List<Family> getFamiliesBiggerThan(int count) {
+        List<Family> result = new ArrayList<>();
+        for (Family f : familyDao.getAllFamilies()) {
+            if (f.countFamily() > count) result.add(f);
+        }
+        return result;
+    }
+
+    public List<Family> getFamiliesLessThan(int count) {
+        List<Family> result = new ArrayList<>();
+        for (Family f : familyDao.getAllFamilies()) {
+            if (f.countFamily() < count) result.add(f);
+        }
+        return result;
+    }
+
+    public int countFamiliesWithMemberNumber(int count) {
+        int res = 0;
+        for (Family f : familyDao.getAllFamilies()) {
+            if (f.countFamily() == count) res++;
+        }
+        return res;
+    }
+
+    public Family createNewFamily(Human mother, Human father) {
+        Family family = new Family(mother, father);
+        familyDao.saveFamily(family);
+        return family;
+    }
+
+    public boolean deleteFamilyByIndex(int index) {
+        return familyDao.deleteFamily(index);
+    }
+
+    public Family bornChild(Family family, String boyName, String girlName) {
+        Random rand = new Random();
+        boolean isBoy = rand.nextBoolean();
+        String name = isBoy ? boyName : girlName;
+        long birthDate = new Date().getTime();
+        Human child = new Human(name, family.getFather().getSurname(), birthDate, 0, new HashMap<>());
+        family.addChild(child);
+        familyDao.saveFamily(family);
+        return family;
+    }
+
+    public Family adoptChild(Family family, Human child) {
+        family.addChild(child);
+        familyDao.saveFamily(family);
+        return family;
+    }
+
+    public void deleteAllChildrenOlderThen(int age) {
+        for (Family family : familyDao.getAllFamilies()) {
+            List<Human> toRemove = new ArrayList<>();
+            for (Human child : family.getChildren()) {
+                LocalDate birthDate = new Date(child.getYear()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                int years = Period.between(birthDate, LocalDate.now()).getYears();
+                if (years > age) toRemove.add(child);
+            }
+            for (Human child : toRemove) family.deleteChild(child);
+            familyDao.saveFamily(family);
+        }
+    }
+
+    public int count() {
+        return familyDao.getAllFamilies().size();
+    }
+
+    public Family getFamilyById(int id) {
+        return familyDao.getFamilyByIndex(id);
+    }
+
+    public Set<Pet> getPets(int familyIndex) {
+        Family family = familyDao.getFamilyByIndex(familyIndex);
+        return family != null ? family.getPets() : Collections.emptySet();
+    }
+
+    public void addPet(int familyIndex, Pet pet) {
+        Family family = familyDao.getFamilyByIndex(familyIndex);
+        if (family != null) {
+            family.addPet(pet);
+            familyDao.saveFamily(family);
+        }
+    }
 
 
     public void saveToFile(String filename) throws IOException {
@@ -18,7 +140,7 @@ public class FamilyService {
         if (!dir.exists()) dir.mkdirs();
         File file = new File(dir, filename);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            for (Family family : families) {
+            for (Family family : familyDao.getAllFamilies()) {
                 writer.write(prettyFormat(family));
                 writer.write(System.lineSeparator());
                 writer.write("--------------------------------------------------");
@@ -27,10 +149,13 @@ public class FamilyService {
         }
     }
 
-    //families.txt
     @SuppressWarnings("unchecked")
     public void loadFromFile(String filename) throws IOException, ParseException {
-        families.clear();
+        List<Family> currentFamilies = new ArrayList<>(familyDao.getAllFamilies());
+        for (Family f : currentFamilies) {
+            familyDao.deleteFamily(f);
+        }
+
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
             Human mother = null, father = null;
@@ -40,24 +165,21 @@ public class FamilyService {
                 line = line.trim();
                 if (line.startsWith("Мати:")) {
                     mother = parseHumanBlock(reader);
-
                 } else if (line.startsWith("Батько:")) {
                     father = parseHumanBlock(reader);
-
                 } else if (line.startsWith("Діти: [")) {
                     while ((line = reader.readLine()) != null) {
                         line = line.trim();
                         if (line.equals("]")) break;
                         children.add(parseHumanBlockFromChild(line, reader));
                     }
-
                 } else if (line.startsWith("Тварина:")) {
                     pet = parsePetBlock(line);
                     if (mother != null && father != null) {
                         Family family = new Family(mother, father);
                         for (Human child : children) family.addChild(child);
                         if (pet != null) family.setPet(pet);
-                        families.add(family);
+                        familyDao.saveFamily(family);
                         mother = null;
                         father = null;
                         children = new ArrayList<>();
@@ -67,20 +189,6 @@ public class FamilyService {
             }
         }
     }
-    public void loadFamiliesFromDB(String filename) throws IOException, ParseException {
-        int itr = 0;
-        List<Family> loadedFamilies = new ArrayList<>();
-        File file = new File("database", filename);
-        System.out.println("Trying to open file: " + file.getAbsolutePath());
-        loadFromFile(filename);
-    }
-    //Примітка
-    //Ця функція мала би працювати з файломз датабази, який містить дані про сім'ї.
-    //Але вона чомусь не працює, хоча і застосовує метод loadFromFile, який повністю робочий, я використовував для перевірки файл families.txt.
-    //Мені коже раз вибивається така помилка:
-    //Trying to open file: C:\Users\andre\IdeaProjects\hm6\database\vv.txt
-    //Сталася помилка: vv.txt (The system cannot find the file specified)
-
     private Human parseHumanBlock(BufferedReader reader) throws IOException, ParseException {
         String name = "", surname = "", birthDate = "";
         int iq = 0;
@@ -187,111 +295,5 @@ public class FamilyService {
         return line.substring(start, end).replaceAll("[^\\wа-яА-Я]", "").trim();
     }
 
-    public void loadData(List<Family> families) {
-        this.families = new ArrayList<>(families);
-    }
 
-    public String prettyFormat(Family family) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Сім'я: \n");
-        sb.append("  Мати: ").append(family.getMother()).append("\n");
-        sb.append("  Батько: ").append(family.getFather()).append("\n");
-        sb.append("  Діти: ").append(family.getChildren()).append("\n");
-        sb.append("  Тварина: ").append(family.getPet()).append("\n");
-        return sb.toString();
-    }
-
-    public void displayAllFamilies() {
-        for (int i = 0; i < families.size(); i++) {
-            System.out.println((i + 1) + ". " + prettyFormat(families.get(i)));
-            System.out.println();
-        }
-    }
-
-    public Family getFamilyByIndex(int familyIndex) {
-        if (familyIndex >= 0 && familyIndex < families.size()) {
-            return families.get(familyIndex);
-        }
-        return null;
-    }
-
-    public List<Family> getFamiliesBiggerThan(int count) {
-        List<Family> filteredFamilies = families.stream()
-                .filter(family -> family.countFamily() > count)
-                .collect(Collectors.toList());
-
-        //filteredFamilies.forEach(family ->
-        //System.out.println(family + ", members: " + family.countFamily()));
-
-        return filteredFamilies;
-    }
-
-
-    public List<Family> getFamiliesLessThan(int count) {
-        List<Family> filteredFamilies = families.stream()
-                .filter(family -> family.countFamily() < count)
-                .collect(Collectors.toList());
-
-        filteredFamilies.forEach(family ->
-                System.out.println(family + ", members: " + family.countFamily()));
-
-        return filteredFamilies;
-    }
-
-
-    public int countFamiliesWithMemberNumber(int count) {
-        return (int) families.stream()
-                .filter(family -> family.countFamily() == count)
-                .count();
-    }
-
-
-    public void deleteAllChildrenOlderThan(int age) {
-        families.forEach(family -> {
-            List<Human> children = family.getChildren();
-            List<Human> childrenToRemove = children.stream()
-                    .filter(child -> {
-                        LocalDate birthDate = new Date(child.getYear())
-                                .toInstant()
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDate();
-
-                        LocalDate currentDate = LocalDate.now();
-                        Period period = Period.between(birthDate, currentDate);
-
-                        return period.getYears() > age;
-                    })
-                    .collect(Collectors.toList());
-
-            childrenToRemove.forEach(family::deleteChild);
-        });
-    }
-
-
-    public void addFamily(Family family) {
-        families.add(family);
-    }
-
-    public List<Family> getAllFamilies() {
-        return new ArrayList<>(families);
-    }
-
-    public Family getFamilyById(int id) {
-        if (id >= 0 && id < families.size()) {
-            return families.get(id);
-        }
-        return null;
-    }
-
-    public boolean deleteFamily(int id) {
-        if (id >= 0 && id < families.size()) {
-            families.remove(id);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean deleteFamily(Family family) {
-        return families.remove(family);
-    }
 }

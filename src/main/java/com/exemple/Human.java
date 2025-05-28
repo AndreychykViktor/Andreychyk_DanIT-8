@@ -23,15 +23,15 @@ public class Human {
         this.schedule = schedule != null ? schedule : new HashMap<>();
     }
 
-public Human(String name, String surname, String birthDateStr, int iq, HashMap<DayOfWeek, String> schedule) throws java.text.ParseException {
-    this.name = name;
-    this.surname = surname;
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    Date date = dateFormat.parse(birthDateStr);
-    this.birthDate = date.getTime();
-    this.iq = iq;
-    this.schedule = schedule != null ? schedule : new HashMap<>();
-}
+    public Human(String name, String surname, String birthDateStr, int iq, HashMap<DayOfWeek, String> schedule) throws java.text.ParseException {
+        this.name = name;
+        this.surname = surname;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = dateFormat.parse(birthDateStr);
+        this.birthDate = date.getTime();
+        this.iq = iq;
+        this.schedule = schedule != null ? schedule : new HashMap<>();
+    }
 
     public Human(String name, String surname, long birthDate, int iq, String[][] schedule) {
         this.name = name;
@@ -71,6 +71,7 @@ public Human(String name, String surname, String birthDateStr, int iq, HashMap<D
         return String.format("%d роки, %d місяців, %d днів",
                 period.getYears(), period.getMonths(), period.getDays());
     }
+
     public void greetPet() {
         if (family != null && !family.getPets().isEmpty()) {
             Pet pet = family.getPets().iterator().next();
@@ -122,13 +123,13 @@ public Human(String name, String surname, String birthDateStr, int iq, HashMap<D
         this.iq = iq;
     }
 
-   public HashMap<DayOfWeek, String> getSchedule() {
-       return schedule;
-   }
+    public HashMap<DayOfWeek, String> getSchedule() {
+        return schedule;
+    }
 
-   public void setSchedule(HashMap<DayOfWeek, String> schedule) {
-       this.schedule = schedule;
-   }
+    public void setSchedule(HashMap<DayOfWeek, String> schedule) {
+        this.schedule = schedule;
+    }
 
     public Family getFamily() {
         return family;
@@ -145,11 +146,11 @@ public Human(String name, String surname, String birthDateStr, int iq, HashMap<D
 
         return "Human{" + "\n" +
                 " Name='" + name + '\'' + ",\n" +
-                " Surname='" + surname + '\'' +",\n" +
-                " BirthDate=" + birthDateFormatted +",\n" +
-                " ExactTime=" + describeAge() +",\n" +
-                " Iq=" + iq +",\n" +
-                " Schedule=" + schedule +",\n" +
+                " Surname='" + surname + '\'' + ",\n" +
+                " BirthDate=" + birthDateFormatted + ",\n" +
+                " ExactTime=" + describeAge() + ",\n" +
+                " Iq=" + iq + ",\n" +
+                " Schedule=" + schedule + ",\n" +
                 '}' + "\n";
     }
 
